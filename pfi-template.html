@@ -374,6 +374,17 @@
             padding-top: 8px;
             padding-bottom: 8px;
         }
+
+        /* Amount in words section */
+        .amount-in-words {
+            margin: 8px 0;
+            font-style: italic;
+            font-size: var(--font-size-base);
+            background-color: rgba(240, 244, 255, 0.5);
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px dashed var(--border-color);
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -426,6 +437,10 @@
                             <td id="total"></td>
                         </tr>
                     </table>
+                    <!-- Add amount in words -->
+                    <div class="amount-in-words">
+                        Amount in words: <span id="amountInWords">Zero dollars only</span>
+                    </div>
                 </div>
                 
                 <div class="footer">
@@ -485,6 +500,92 @@
         </div>
     </div>
     <script>
+        // Add function to convert number to words
+        function numberToWords(num) {
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+                'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+                'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            
+            function convertLessThanOneThousand(num) {
+                if (num === 0) return '';
+                
+                if (num < 20) {
+                    return ones[num];
+                }
+                
+                const ten = Math.floor(num / 10);
+                const unit = num % 10;
+                
+                return tens[ten] + (unit ? '-' + ones[unit] : '');
+            }
+            
+            if (num === 0) return 'Zero';
+            
+            // Handle negative numbers
+            const negative = num < 0;
+            num = Math.abs(num);
+            
+            // Split into integer and decimal parts
+            const parts = num.toString().split('.');
+            let result = '';
+            
+            // Process integer part
+            let integerNum = parseInt(parts[0]);
+            
+            if (integerNum === 0) {
+                result = 'Zero';
+            } else {
+                // Maximum supported is billions
+                const billions = Math.floor(integerNum / 1000000000);
+                integerNum -= billions * 1000000000;
+                
+                const millions = Math.floor(integerNum / 1000000);
+                integerNum -= millions * 1000000;
+                
+                const thousands = Math.floor(integerNum / 1000);
+                integerNum -= thousands * 1000;
+                
+                if (billions) {
+                    result += convertLessThanOneThousand(billions) + ' Billion ';
+                }
+                
+                if (millions) {
+                    result += convertLessThanOneThousand(millions) + ' Million ';
+                }
+                
+                if (thousands) {
+                    result += convertLessThanOneThousand(thousands) + ' Thousand ';
+                }
+                
+                if (integerNum) {
+                    result += convertLessThanOneThousand(integerNum);
+                }
+            }
+            
+            // Add decimal part if exists
+            if (parts.length > 1) {
+                const decimals = parts[1].padEnd(2, '0').substring(0, 2);
+                if (parseInt(decimals) > 0) {
+                    result += ' and ' + convertLessThanOneThousand(parseInt(decimals)) + ' Cents';
+                }
+            }
+            
+            // Add "dollars" and handle negative
+            result = result.trim() + ' Dollars';
+            if (negative) result = 'Negative ' + result;
+            
+            return result;
+        }
+
+        // Format number with thousands separators
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US', { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
         function getPFIData() {
             try {
                 const params = new URLSearchParams(window.location.search);
@@ -602,7 +703,9 @@
                         if (i < displayProducts.length) {
                             const product = displayProducts[i];
                             if (product && typeof product === 'object') {
-                                const amount = ((product.quantity || 0) * (product.unitPrice || 0)).toFixed(2);
+                                const quantity = product.quantity || 0;
+                                const unitPrice = product.unitPrice || 0;
+                                const amount = quantity * unitPrice;
                                 
                                 // Truncate description if too long
                                 let description = product.description || 'N/A';
@@ -614,9 +717,9 @@
                                     <td>${i + 1}</td>
                                     <td>${description}</td>
                                     <td>${product.hsCode || 'N/A'}</td>
-                                    <td>${product.quantity || '0'}</td>
-                                    <td>${parseFloat(product.unitPrice || 0).toFixed(2)}</td>
-                                    <td>${amount}</td>
+                                    <td>${formatNumber(quantity)}</td>
+                                    <td>${formatNumber(unitPrice)}</td>
+                                    <td>${formatNumber(amount)}</td>
                                 `;
                             }
                         } else {
@@ -660,9 +763,20 @@
                     }
                 }
 
-                // Update total with proper formatting
-                const total = data.totalAmount ? parseFloat(data.totalAmount).toFixed(2) : '0.00';
-                document.getElementById('total').textContent = `${total} ${data.currency || 'USD'}`;
+                // Update total with proper formatting and thousands separators
+                const totalAmount = data.totalAmount ? parseFloat(data.totalAmount) : 0;
+                document.getElementById('total').textContent = `${formatNumber(totalAmount)} ${data.currency || 'USD'}`;
+                
+                // Add amount in words
+                const currency = data.currency || 'USD';
+                let amountInWordsText = numberToWords(totalAmount);
+                
+                // Replace "Dollars" with the appropriate currency
+                if (currency !== 'USD') {
+                    amountInWordsText = amountInWordsText.replace('Dollars', currency);
+                }
+                
+                document.getElementById('amountInWords').textContent = amountInWordsText + ' only';
 
                 // Set stamp date
                 document.getElementById('stampDate').textContent = formatDate(data.stampDate);
@@ -810,4 +924,3 @@
     <img src="jibril-signature.png" alt="Signature2" class="preload-image" crossorigin="anonymous" style="display: none;">
 </body>
 </html>
-
