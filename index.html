@@ -114,6 +114,30 @@
                 gap: 0.5rem;
             }
         }
+        
+        /* New styles for synced field indicator */
+        .sync-active {
+            border-color: #2e7d32;
+            background-color: rgba(46, 125, 50, 0.05);
+        }
+        
+        .sync-indicator {
+            color: #2e7d32;
+            font-size: 0.75rem;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sync-indicator.active {
+            opacity: 1;
+        }
+        
+        .sync-icon {
+            margin-right: 3px;
+        }
     </style>
 </head>
 <body class="bg-white text-gray-800 min-h-screen flex flex-col">
@@ -154,8 +178,16 @@
                             <textarea id="billTo" name="billTo" rows="3" class="form-input mt-1 block w-full"></textarea>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="shipTo">Ship To:</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="shipTo">
+                                Ship To:
+                                <span id="syncToggle" class="ml-2 text-xs cursor-pointer text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-sync-alt"></i> Auto-sync with Bill To
+                                </span>
+                            </label>
                             <textarea id="shipTo" name="shipTo" rows="3" class="form-input mt-1 block w-full"></textarea>
+                            <div id="syncIndicator" class="sync-indicator">
+                                <i class="fas fa-link sync-icon"></i> Synced with Bill To
+                            </div>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -253,7 +285,7 @@
     <!-- Footer -->
     <footer class="bg-gray-100 py-2 mt-auto">
         <div class="container mx-auto px-4 text-center text-sm text-gray-600">
-            &copy; 2024 Classic Petroleum
+            &copy; 2025 Classic Petroleum
         </div>
     </footer>
 
@@ -263,7 +295,46 @@
             const generatePDFButton = document.getElementById('generatePDF');
             const pfiSearch = document.getElementById('pfiSearch');
             const pfiList = document.getElementById('pfiList');
-
+            const billToField = document.getElementById('billTo');
+            const shipToField = document.getElementById('shipTo');
+            const syncToggle = document.getElementById('syncToggle');
+            const syncIndicator = document.getElementById('syncIndicator');
+            
+            // Variable to track sync state
+            let syncEnabled = true; // Default to enabled
+            
+            // Enable sync by default
+            shipToField.classList.add('sync-active');
+            syncIndicator.classList.add('active');
+            
+            // Function to sync Ship To with Bill To
+            function syncFields() {
+                if (syncEnabled) {
+                    shipToField.value = billToField.value;
+                }
+            }
+            
+            // Toggle sync functionality
+            syncToggle.addEventListener('click', () => {
+                syncEnabled = !syncEnabled;
+                
+                if (syncEnabled) {
+                    // Enable sync - copy current value
+                    shipToField.classList.add('sync-active');
+                    syncIndicator.classList.add('active');
+                    syncToggle.innerHTML = '<i class="fas fa-sync-alt"></i> Auto-sync with Bill To';
+                    syncFields(); // Sync immediately
+                } else {
+                    // Disable sync
+                    shipToField.classList.remove('sync-active');
+                    syncIndicator.classList.remove('active');
+                    syncToggle.innerHTML = '<i class="fas fa-sync-alt text-gray-400"></i> Enable auto-sync';
+                }
+            });
+            
+            // Listen for changes to Bill To field to update Ship To
+            billToField.addEventListener('input', syncFields);
+            
             // Set default date to today
             document.getElementById('date').valueAsDate = new Date();
 
@@ -602,22 +673,6 @@
             document.getElementById('productsList').appendChild(template);
         });
     </script>
-    <div class="signatures">
-        <div>
-            <p>Approved by: FARHAN JAMA</p>
-            <p>Sign:</p>
-            <span class="signature-line">
-                <!-- ...existing code... -->
-            </span>
-        </div>
-        <div>
-            <p>Finance manager: FARHAN JAMA</p>
-            <p>Sign:</p>
-            <span class="signature-line">
-                <!-- ...existing code... -->
-            </span>
-        </div>
-        <!-- ...existing code... -->
-    </div>
+   
 </body>
 </html>
