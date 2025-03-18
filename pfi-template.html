@@ -500,92 +500,110 @@
         </div>
     </div>
     <script>
-        // Fixed function to convert number to words
+        // Completely rewritten number to words conversion function
         function numberToWords(num) {
-            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
-                'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
-                'Seventeen', 'Eighteen', 'Nineteen'];
-            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-            
-            function convertLessThanOneThousand(num) {
-                if (num === 0) return '';
-                
-                if (num < 20) {
-                    return ones[num];
-                }
-                
-                const ten = Math.floor(num / 10);
-                const unit = num % 10;
-                
-                return tens[ten] + (unit ? '-' + ones[unit] : '');
+            // Handle edge cases
+            if (num === undefined || num === null || isNaN(num)) {
+                console.warn('Invalid number passed to numberToWords:', num);
+                return 'Zero';
             }
             
+            // Ensure we're working with a number
+            num = Number(num);
+            
+            // Special case for zero
             if (num === 0) return 'Zero';
             
             // Handle negative numbers
             const negative = num < 0;
             num = Math.abs(num);
             
+            // Arrays for word conversion
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const scales = ['', 'Thousand', 'Million', 'Billion', 'Trillion'];
+            
+            // Helper function for converting groups of 3 digits
+            function convertGroup(n) {
+                let result = '';
+                
+                // Handle hundreds place
+                if (n >= 100) {
+                    result += ones[Math.floor(n / 100)] + ' Hundred';
+                    n %= 100;
+                    if (n > 0) result += ' ';
+                }
+                
+                // Handle tens and ones places
+                if (n >= 10 && n <= 19) {
+                    // Special case for 10-19
+                    result += teens[n - 10];
+                } else if (n >= 20) {
+                    // For 20+
+                    result += tens[Math.floor(n / 10)];
+                    if (n % 10 > 0) {
+                        result += '-' + ones[n % 10];
+                    }
+                } else if (n > 0) {
+                    // Just ones digit
+                    result += ones[n];
+                }
+                
+                return result;
+            }
+            
             // Split into integer and decimal parts
             const parts = num.toString().split('.');
+            let integerPart = parseInt(parts[0]);
+            
+            // Conversion for the integer part
             let result = '';
+            let groupCount = 0;
             
-            // Process integer part
-            let integerNum = parseInt(parts[0]);
-            
-            if (integerNum === 0) {
-                result = 'Zero';
-            } else {
-                // Maximum supported is billions
-                const billions = Math.floor(integerNum / 1000000000);
-                integerNum -= billions * 1000000000;
+            // Process each group of 3 digits from right to left
+            while (integerPart > 0) {
+                const group = integerPart % 1000;
+                integerPart = Math.floor(integerPart / 1000);
                 
-                const millions = Math.floor(integerNum / 1000000);
-                integerNum -= millions * 1000000;
-                
-                const thousands = Math.floor(integerNum / 1000);
-                integerNum -= thousands * 1000;
-                
-                const hundreds = integerNum;
-                
-                let resultParts = [];
-                
-                if (billions) {
-                    resultParts.push(convertLessThanOneThousand(billions) + ' Billion');
+                if (group > 0) {
+                    const groupText = convertGroup(group);
+                    const scaleName = scales[groupCount];
+                    
+                    // Add appropriate scale name (thousand, million, etc.)
+                    if (groupCount > 0) {
+                        result = groupText + ' ' + scaleName + (result ? ' ' + result : '');
+                    } else {
+                        result = groupText;
+                    }
                 }
                 
-                if (millions) {
-                    resultParts.push(convertLessThanOneThousand(millions) + ' Million');
-                }
-                
-                if (thousands) {
-                    resultParts.push(convertLessThanOneThousand(thousands) + ' Thousand');
-                }
-                
-                if (hundreds) {
-                    resultParts.push(convertLessThanOneThousand(hundreds));
-                }
-                
-                result = resultParts.join(' ');
+                groupCount++;
             }
             
-            // Add decimal part if exists
-            if (parts.length > 1) {
-                const decimals = parts[1].padEnd(2, '0').substring(0, 2);
-                if (parseInt(decimals) > 0) {
-                    result += ' and ' + convertLessThanOneThousand(parseInt(decimals)) + ' Cents';
+            // Add decimal part if it exists
+            if (parts.length > 1 && parseInt(parts[1]) > 0) {
+                const decimalPart = parts[1].padEnd(2, '0').substring(0, 2); // Format to 2 decimal places
+                const cents = parseInt(decimalPart);
+                
+                if (cents > 0) {
+                    result += ' and ' + convertGroup(cents) + ' Cents';
                 }
             }
             
-            // Add "dollars" and handle negative
-            result = result.trim() + ' Dollars';
-            if (negative) result = 'Negative ' + result;
+            // Format the final result
+            result = (negative ? 'Negative ' : '') + (result || 'Zero') + ' Dollars';
             
             return result;
         }
 
         // Format number with thousands separators
         function formatNumber(num) {
+            // Handle invalid input
+            if (num === undefined || num === null || isNaN(num)) {
+                return '0.00';
+            }
+            
             return new Intl.NumberFormat('en-US', { 
                 minimumFractionDigits: 2, 
                 maximumFractionDigits: 2
@@ -770,22 +788,30 @@
                 }
 
                 // Update total with proper formatting and thousands separators
-                const totalAmount = data.totalAmount ? parseFloat(data.totalAmount) : 0;
+                const totalAmount = parseFloat(data.totalAmount) || 0;
                 document.getElementById('total').textContent = `${formatNumber(totalAmount)} ${data.currency || 'USD'}`;
                 
-                // Add amount in words
-                const currency = data.currency || 'USD';
-                let amountInWordsText = numberToWords(totalAmount);
-                
-                // Replace "Dollars" with the appropriate currency
-                if (currency !== 'USD') {
-                    amountInWordsText = amountInWordsText.replace('Dollars', currency);
+                // Add amount in words with better error handling
+                try {
+                    const currency = data.currency || 'USD';
+                    const totalAsNumber = parseFloat(data.totalAmount) || 0;
+                    
+                    console.log('Converting to words:', totalAsNumber);
+                    let amountInWordsText = numberToWords(totalAsNumber);
+                    
+                    // Replace "Dollars" with the appropriate currency
+                    if (currency !== 'USD') {
+                        amountInWordsText = amountInWordsText.replace('Dollars', currency);
+                    }
+                    
+                    document.getElementById('amountInWords').textContent = amountInWordsText + ' only';
+                } catch (error) {
+                    console.error('Error generating amount in words:', error);
+                    document.getElementById('amountInWords').textContent = 'Zero ' + (data.currency || 'USD') + ' only';
                 }
-                
-                document.getElementById('amountInWords').textContent = amountInWordsText + ' only';
 
                 // Set stamp date
-                document.getElementById('stampDate').textContent = formatDate(data.stampDate);
+                document.getElementById('stampDate').textContent = formatDate(data.stampDate || new Date());
 
                 // Generate QR code for verification
                 generateQRCode(data);
@@ -795,6 +821,7 @@
 
             } catch (error) {
                 console.error('Error in populatePFI:', error);
+                alert('An error occurred while generating the invoice. Please try again.');
             }
         }
 
