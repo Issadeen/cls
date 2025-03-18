@@ -500,7 +500,7 @@
         </div>
     </div>
     <script>
-        // Add function to convert number to words
+        // Fixed function to convert number to words
         function numberToWords(num) {
             const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
                 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
@@ -546,21 +546,27 @@
                 const thousands = Math.floor(integerNum / 1000);
                 integerNum -= thousands * 1000;
                 
+                const hundreds = integerNum;
+                
+                let resultParts = [];
+                
                 if (billions) {
-                    result += convertLessThanOneThousand(billions) + ' Billion ';
+                    resultParts.push(convertLessThanOneThousand(billions) + ' Billion');
                 }
                 
                 if (millions) {
-                    result += convertLessThanOneThousand(millions) + ' Million ';
+                    resultParts.push(convertLessThanOneThousand(millions) + ' Million');
                 }
                 
                 if (thousands) {
-                    result += convertLessThanOneThousand(thousands) + ' Thousand ';
+                    resultParts.push(convertLessThanOneThousand(thousands) + ' Thousand');
                 }
                 
-                if (integerNum) {
-                    result += convertLessThanOneThousand(integerNum);
+                if (hundreds) {
+                    resultParts.push(convertLessThanOneThousand(hundreds));
                 }
+                
+                result = resultParts.join(' ');
             }
             
             // Add decimal part if exists
