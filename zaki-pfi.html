@@ -8,18 +8,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --primary-color: #0d4c2b;
-            --secondary-color: #38b000;
-            --accent-color: #a3e635;
-            --background-color: #f0fdf4;
+            --primary-color: #9B1C1F;        /* Deep royal red */
+            --secondary-color: #D32F2F;      /* Bright royal red */
+            --accent-color: #FF5252;         /* Light royal red */
+            --background-color: #FFF5F5;     /* Very light red background */
             --surface-color: #ffffff;
-            --text-primary: #1e293b;
-            --border-color: #b6e2d3;
+            --text-primary: #4A0404;         /* Dark red text */
+            --border-color: #FFCDD2;         /* Very light royal red */
             --font-size-base: 14px;
         }
+        
         .header-gradient {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         }
+        
         .btn {
             background: var(--primary-color);
             color: white;
@@ -28,24 +30,31 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            box-shadow: 0 2px 4px rgba(155, 28, 31, 0.2);
         }
+        
         .btn-accent {
             background: var(--accent-color);
-            color: #0d4c2b;
+            color: white;
         }
+        
         .form-input {
             border: 1px solid var(--border-color);
             padding: 0.5rem;
             font-size: 0.9rem;
             border-radius: 4px;
         }
+        
         .glass-effect {
-            background: rgba(240, 253, 244, 0.95);
+            background: rgba(255, 245, 245, 0.95); /* Light red tint */
             border: 1px solid var(--border-color);
             padding: 1rem;
             border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(155, 28, 31, 0.1);
         }
     </style>
+    <!-- Add Font Awesome for sync icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="bg-white text-gray-800 min-h-screen flex flex-col">
     <!-- Header -->
@@ -55,11 +64,11 @@
                 <img src="zaki-logo.png" alt="Zaki Gas Logo" class="h-10 w-10 rounded-lg shadow-md">
                 <div>
                     <h1 class="text-white text-xl font-bold">ZAKI GAS</h1>
-                    <p class="text-green-100 text-sm">LPG & Gas Solutions</p>
+                    <p class="text-red-100 text-sm">LPG & Gas Solutions</p>
                 </div>
             </div>
             <nav class="flex items-center gap-4">
-                <a href="index.html" class="text-white hover:text-green-100 transition-colors">
+                <a href="index.html" class="text-white hover:text-red-100 transition-colors">
                     <i class="fas fa-home mr-2"></i>Home
                 </a>
             </nav>
@@ -69,7 +78,7 @@
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8 relative z-10 pt-20">
         <div class="max-w-5xl mx-auto">
-            <h2 class="text-3xl font-bold text-center text-green-900 mb-8">Create Zaki Gas Proforma Invoice</h2>
+            <h2 class="text-3xl font-bold text-center text-red-900 mb-8">Create Zaki Gas Proforma Invoice</h2>
             <div class="glass-effect rounded-lg p-6">
                 <form id="zakiPfiForm" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -78,8 +87,16 @@
                             <textarea id="billTo" name="billTo" rows="3" class="form-input mt-1 block w-full"></textarea>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium" for="shipTo">Ship To:</label>
+                            <label class="block text-sm font-medium" for="shipTo">
+                                Ship To:
+                                <span id="syncToggle" class="ml-2 text-xs cursor-pointer text-red-500 hover:text-red-700">
+                                    <i class="fas fa-sync-alt"></i> Auto-sync with Bill To
+                                </span>
+                            </label>
                             <textarea id="shipTo" name="shipTo" rows="3" class="form-input mt-1 block w-full"></textarea>
+                            <div id="syncIndicator" class="text-red-600 text-xs mt-1 flex items-center opacity-0 transition-opacity duration-300">
+                                <i class="fas fa-link mr-1"></i> Synced with Bill To
+                            </div>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -130,7 +147,7 @@
                         <div>
                             <label class="block text-sm font-medium" for="currency">Currency:</label>
                             <select id="currency" name="currency" class="form-input mt-1 block w-full">
-                                <option value="USD">USD</option>
+                                <option value="USD" selected>USD</option>
                                 <option value="KES">KES</option>
                                 <option value="EUR">EUR</option>
                             </select>
@@ -141,7 +158,7 @@
                         </div>
                     </div>
                     <div class="flex justify-end space-x-4">
-                        <button type="button" id="generatePDF" class="btn">
+                        <button type="button" id="generatePDF" class="btn hover:bg-red-700 transition-colors">
                             Generate PDF
                         </button>
                     </div>
@@ -149,14 +166,15 @@
             </div>
         </div>
     </main>
-    <footer class="bg-gray-100 py-2 mt-auto">
-        <div class="container mx-auto px-4 text-center text-sm text-gray-600">
+    <footer class="bg-red-50 py-2 mt-auto">
+        <div class="container mx-auto px-4 text-center text-sm text-red-800">
             &copy; 2025 Zaki Gas Trading Company Ltd
         </div>
     </footer>
     <script>
-        // Set default date to today
+        // Set default date to today and default currency to USD
         document.getElementById('date').valueAsDate = new Date();
+        document.getElementById('currency').value = 'USD';
 
         // Add product row functionality
         document.getElementById('addProduct').addEventListener('click', () => {
@@ -164,6 +182,46 @@
             template.querySelectorAll('input').forEach(input => input.value = '');
             document.getElementById('productsList').appendChild(template);
         });
+
+        // Variable to track sync state
+        let syncEnabled = true; // Default to enabled
+        
+        // Enable sync by default
+        const shipToField = document.getElementById('shipTo');
+        const billToField = document.getElementById('billTo');
+        const syncToggle = document.getElementById('syncToggle');
+        const syncIndicator = document.getElementById('syncIndicator');
+        
+        shipToField.classList.add('border-red-400', 'bg-red-50', 'bg-opacity-20');
+        syncIndicator.classList.remove('opacity-0');
+        
+        // Function to sync Ship To with Bill To
+        function syncFields() {
+            if (syncEnabled) {
+                shipToField.value = billToField.value;
+            }
+        }
+        
+        // Toggle sync functionality
+        syncToggle.addEventListener('click', () => {
+            syncEnabled = !syncEnabled;
+            
+            if (syncEnabled) {
+                // Enable sync - copy current value
+                shipToField.classList.add('border-red-400', 'bg-red-50', 'bg-opacity-20');
+                syncIndicator.classList.remove('opacity-0');
+                syncToggle.innerHTML = '<i class="fas fa-sync-alt"></i> Auto-sync with Bill To';
+                syncFields(); // Sync immediately
+            } else {
+                // Disable sync
+                shipToField.classList.remove('border-red-400', 'bg-red-50', 'bg-opacity-20');
+                syncIndicator.classList.add('opacity-0');
+                syncToggle.innerHTML = '<i class="fas fa-sync-alt text-gray-400"></i> Enable auto-sync';
+            }
+        });
+        
+        // Listen for changes to Bill To field to update Ship To
+        billToField.addEventListener('input', syncFields);
 
         function getFormData() {
             const form = document.getElementById('zakiPfiForm');
@@ -201,6 +259,9 @@
                 alert('Please fill in all required fields and add at least one product.');
                 return;
             }
+            // Force currency to USD for PDF generation
+            formData.currency = 'USD';
+
             // Create query parameters
             const queryParams = new URLSearchParams();
             if (formData.products && Array.isArray(formData.products)) {
@@ -212,6 +273,7 @@
                     queryParams.append(key, encodeURIComponent(value.toString()));
                 }
             }
+            // Open template in new window
             window.open(`zaki-pfi-template.html?${queryParams.toString()}`, '_blank');
         });
     </script>
