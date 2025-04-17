@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Proforma Invoice System</title>
+    <meta name="viewport" content="width=400, initial-scale=1.0">
+    <link rel="icon" href="logo.png" type="image/png">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f4ff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 24px rgba(30,64,175,0.08);
+            padding: 2rem 2.5rem;
+            text-align: center;
+        }
+        h1 {
+            color: #1e40af;
+            margin-bottom: 1.5rem;
+        }
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            background: linear-gradient(90deg, #1e40af 60%, #60a5fa 100%);
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .nav-link.zaki {
+            background: linear-gradient(90deg, #0d4c2b 60%, #38b000 100%);
+        }
+        .nav-link:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 2px 8px rgba(30,64,175,0.10);
+        }
+        .logo {
+            height: 32px;
+            width: 32px;
+            border-radius: 5px;
+            background: #fff;
+            object-fit: contain;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Proforma Invoice System</h1>
+        <div class="nav-links">
+            <a class="nav-link" href="pfi.html">
+                <img src="logo.png" alt="Classic Petroleum" class="logo">
+                Classic Petroleum Proforma Invoice
+            </a>
+            <a class="nav-link zaki" href="zaki-pfi.html">
+                <img src="zaki-logo.png" alt="Zaki Gas" class="logo">
+                Zaki Gas Proforma Invoice
+            </a>
+        </div>
+    </div>
+</body>
+</html>

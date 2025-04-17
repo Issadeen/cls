@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Forma Invoice - Zaki Gas</title>
+    <style>
+        :root {
+            --primary-color: #9B1C1F;
+            --secondary-color: #D32F2F;
+            --accent-color: #FF5252;
+            --border-color: #FFCDD2;
+            --font-size-base: 11px;
+            --font-size-small: 10px;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.2;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: white;
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+        }
+
+        .invoice {
+            padding: 1cm 1cm;
+            position: relative;
+            box-sizing: border-box;
+            width: 210mm;
+            height: 297mm;
+            max-height: 297mm;
+            overflow: hidden;
+            page-break-after: avoid;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 0.8rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin: 8px 0;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .company-name {
+            color: var(--success-color);
+            font-size: 20px;
+            margin: 0.25rem 0;
+            font-weight: bold;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+            margin: 0.8rem 0;
+            padding: 10px;
+            font-size: var(--font-size-base);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.8rem 0;
+            font-size: var(--font-size-small);
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 6px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 6px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-size-small);
+        }
+
+        .footer {
+            margin-top: 1rem;
+            font-size: 11px;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .account-details {
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 5px;
+            margin: 5px 0;
+            border: 1px solid #e1e1e1;
+        }
+
+        .account-details p {
+            margin: 3px 0;
+            font-size: var(--font-size-small);
+        }
+
+        .header p {
+            margin: 3px 0;
+            font-size: 12px;
+        }
+
+        .logo {
+            width: 75px;
+            height: auto;
+        }
+
+        .logo-left {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            z-index: 5;
+        }
+
+        .logo-right {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            z-index: 5;
+        }
+
+        .bank-details-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .bank-box {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .bank-box h4 {
+            color: var(--primary-color);
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .bank-box p {
+            margin: 2px 0;
+            font-size: 10px;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .watermark img {
+            width: 400px;
+            height: auto;
+            opacity: 0.04;
+            filter: grayscale(100%) contrast(80%);
+        }
+
+        .amount-in-words {
+            margin: 8px 0;
+            font-style: italic;
+            font-size: var(--font-size-base);
+            background-color: rgba(255, 240, 240, 0.5);
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px dashed var(--border-color);
+        }
+
+        @media print {
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
+            }
+            
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .invoice {
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+
+            table, tr, td, th, .footer {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="invoice">
+        <div class="watermark">
+            <img src="zaky-logo.png" alt="Watermark" crossorigin="anonymous">
+        </div>
+        <img src="zaki-logo.png" alt="Left Logo" class="logo logo-left" crossorigin="anonymous">
+        <img src="zaki-logo.png" alt="Right Logo" class="logo logo-right" crossorigin="anonymous">
+        
+        <div class="header">
+            <h1>PRO FORMA INVOICE</h1>
+            <p class="company-name">ZAKY GAS TRADING COMPANY LIMITED</p>
+            <p>P.O. BOX 16859-00100, NAIROBI KENYA</p>
+            <p>TEL: +254 722 809 882</p>
+            <p>Email: Zakigaztrading@gmail.com</p>
+        </div>
+        
+        <div class="info">
+            <div>
+                <p>PFI NO: <span id="pfiNo"></span></p>
+                <p>DATE: <span id="date"></span></p>
+            </div>
+            <div>
+                <p>CUSTOMER: <span id="customer"></span></p>
+                <p>BILL TO: <span id="transport"></span></p>
+            </div>
+        </div>
+        
+        <table>
+            <tr>
+                <th>NO:</th>
+                <th>DESCRIPTION</th>
+                <th>HS CODE</th>
+                <th>QUANTITY</th>
+                <th>UNIT PRICE</th>
+                <th>AMOUNT</th>
+            </tr>
+            <tbody id="productsTable"></tbody>
+            <tr>
+                <td colspan="5" style="text-align: right;"><strong>TOTAL</strong></td>
+                <td id="total"></td>
+            </tr>
+        </table>
+
+        <div class="amount-in-words">
+            Amount in words: <span id="amountInWords"></span>
+        </div>
+        
+        <div class="footer">
+            <p>COUNTRY OF ORIGIN: NAIROBI KENYA</p>
+            <p>TERM OF SALE: EX-WORKS NAIROBI</p>
+            <p>VALIDITY: THIS OFFER IS VALID FOR ACCEPTANCE BY CLOSE BUSINESS HOURS</p>
+            
+            <div class="footer-details">
+                <h3 style="margin: 5px 0; font-size: 12px;">BANK DETAILS</h3>
+                <div class="bank-details-container">
+                    <div class="bank-box">
+                        <h4>BANK ACCOUNT 1</h4>
+                        <p>BANK NAME: KCB BANK</p>
+                        <p>AC NAME: ZAKYGAZ ENERGY</p>
+                        <p>AC NO: 1337671312</p>
+                        <p>BRANCH: ELDORET WEST</p>
+                        <p>SWIFT CODE: KCBLKENX</p>
+                        <p>BANK CODE: 01</p>
+                        <p>BRANCH CODE: 168</p>
+                    </div>
+                    <div class="bank-box">
+                        <h4>BANK ACCOUNT 2</h4>
+                        <p>BANK NAME: EQUITY BANK</p>
+                        <p>AC NAME: ZAKYGAZ ENERGY</p>
+                        <p>AC NO: 6610005949</p>
+                        <p>BRANCH: ELDORET</p>
+                        <p>SWIFT CODE: ECOCKENA</p>
+                        <p>BANK CODE: 047</p>
+                        <p>BRANCH CODE: 007</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function numberToWords(num) {
+            if (!num) return 'Zero';
+            
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const scales = ['', 'Thousand', 'Million', 'Billion'];
+
+            function convertGroup(n) {
+                let result = '';
+                if (n >= 100) {
+                    result += ones[Math.floor(n / 100)] + ' Hundred ';
+                    n %= 100;
+                }
+                if (n >= 10 && n <= 19) {
+                    result += teens[n - 10];
+                } else if (n >= 20) {
+                    result += tens[Math.floor(n / 10)];
+                    if (n % 10 > 0) result += '-' + ones[n % 10];
+                } else if (n > 0) {
+                    result += ones[n];
+                }
+                return result;
+            }
+
+            const parts = num.toString().split('.');
+            let result = '';
+            let integerPart = parseInt(parts[0]);
+
+            if (integerPart === 0) return 'Zero';
+
+            let scaleIndex = 0;
+            while (integerPart > 0) {
+                if (integerPart % 1000 !== 0) {
+                    result = convertGroup(integerPart % 1000) + ' ' + scales[scaleIndex] + ' ' + result;
+                }
+                integerPart = Math.floor(integerPart / 1000);
+                scaleIndex++;
+            }
+
+            if (parts.length > 1) {
+                const cents = parseInt(parts[1].padEnd(2, '0').substring(0, 2));
+                if (cents > 0) {
+                    result += 'and ' + convertGroup(cents) + ' Cents';
+                }
+            }
+
+            return result.trim();
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function populatePFI() {
+            const data = getPFIData();
+            if (!data) return;
+
+            document.getElementById('pfiNo').textContent = data.pfiNumber || 'N/A';
+            document.getElementById('date').textContent = formatDate(data.date) || 'N/A';
+            document.getElementById('customer').textContent = data.billTo || 'N/A';
+            document.getElementById('transport').textContent = data.shipTo || 'N/A';
+
+            const productsTable = document.getElementById('productsTable');
+            productsTable.innerHTML = '';
+
+            if (Array.isArray(data.products) && data.products.length > 0) {
+                data.products.forEach((product, index) => {
+                    const row = document.createElement('tr');
+                    const amount = (product.quantity || 0) * (product.unitPrice || 0);
+                    
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${product.description || 'N/A'}</td>
+                        <td>${product.hsCode || 'N/A'}</td>
+                        <td>${formatNumber(product.quantity || 0)}</td>
+                        <td>${formatNumber(product.unitPrice || 0)}</td>
+                        <td>${formatNumber(amount)}</td>
+                    `;
+                    productsTable.appendChild(row);
+                });
+            }
+
+            const totalAmount = parseFloat(data.totalAmount) || 0;
+            document.getElementById('total').textContent = `${formatNumber(totalAmount)} ${data.currency || 'USD'}`;
+            
+            const amountInWords = numberToWords(totalAmount);
+            document.getElementById('amountInWords').textContent = `${amountInWords} ${data.currency || 'USD'} Only`;
+
+            setTimeout(() => {
+                const element = document.querySelector('.invoice');
+                const pfiNo = document.getElementById('pfiNo').textContent;
+                
+                const opt = {
+                    margin: 0,
+                    filename: `ZAKY_PFI_${pfiNo}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        scrollY: 0,
+                        scrollX: 0,
+                        windowWidth: document.documentElement.offsetWidth,
+                        windowHeight: document.documentElement.offsetHeight
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: { mode: 'avoid-all' }
+                };
+
+                html2pdf()
+                    .set(opt)
+                    .from(element)
+                    .toPdf()
+                    .output('save', `ZAKY_PFI_${pfiNo}.pdf`);
+            }, 1000);
+        }
+
+        function getPFIData() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const data = {};
+                
+                for (const [key, value] of params.entries()) {
+                    if (key === 'products') {
+                        data[key] = JSON.parse(decodeURIComponent(value));
+                    } else {
+                        data[key] = decodeURIComponent(value);
+                    }
+                }
+                return data;
+            } catch (error) {
+                console.error('Error parsing PFI data:', error);
+                return null;
+            }
+        }
+
+        window.addEventListener('load', populatePFI);
+    </script>
+</body>
+</html>
