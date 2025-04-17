@@ -2,223 +2,640 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Zaki Gas Proforma Invoice</title>
-    <meta name="viewport" content="width=400, initial-scale=1.0">
-    <link rel="icon" href="zaki-logo.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Forma Invoice - Zaki Gas</title>
     <style>
         :root {
-            --primary-color: #0d4c2b;
-            --secondary-color: #38b000;
-            --accent-color: #a3e635;
-            --background-color: #f0fdf4;
-            --surface-color: #ffffff;
-            --text-primary: #1e293b;
-            --border-color: #b6e2d3;
-            --font-size-base: 14px;
+            --primary-color: #9B1C1F;        /* Deep royal red */
+            --secondary-color: #D32F2F;      /* Bright royal red */
+            --accent-color: #FF5252;         /* Light royal red */
+            --border-color: #FFCDD2;         /* Very light royal red */
+            --text-accent: #B71C1C;          /* Dark royal red for highlights */
+            --font-size-base: 11px;
+            --font-size-small: 10px;
         }
-        .header-gradient {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+
+        * {
+            box-sizing: border-box;
         }
-        .btn {
-            background: var(--primary-color);
-            color: white;
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.2;
+            margin: 0;
+            padding: 0;
+            background: white;
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            overflow: hidden;
         }
-        .btn-accent {
-            background: var(--accent-color);
+
+        .page-container {
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .invoice {
+            padding: 1.2cm 1cm;
+            position: relative;
+            box-sizing: border-box;
+            width: 210mm;
+            height: 297mm;
+            max-height: 297mm;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 20px;
+            margin: 8px 0;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+        }
+
+        .company-name {
             color: #0d4c2b;
+            font-size: 16px;
+            margin: 0.25rem 0;
+            font-weight: bold;
         }
-        .form-input {
-            border: 1px solid var(--border-color);
-            padding: 0.5rem;
-            font-size: 0.9rem;
-            border-radius: 4px;
+
+        .header p {
+            margin: 3px 0;
+            font-size: 0.9em;
         }
-        .glass-effect {
-            background: rgba(240, 253, 244, 0.95);
-            border: 1px solid var(--border-color);
-            padding: 1rem;
+
+        .info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+            margin: 0.8rem 0;
+            padding: 10px;
             border-radius: 6px;
+            font-size: var(--font-size-base);
+        }
+
+        .info p {
+            margin: 3px 0;
+        }
+
+        #date {
+            font-size: var(--font-size-base);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.8rem 0;
+            font-size: var(--font-size-small);
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: linear-gradient(to bottom, var(--primary-color), #7A1010); /* Rich gradient */
+            color: white;
+            padding: 3px 4px;
+            text-align: left;
+            font-size: calc(var(--font-size-small) + 1px);
+            white-space: nowrap;
+            border: 1px solid var(--primary-color);
+            font-weight: bold;
+        }
+
+        td {
+            padding: 1px 4px;
+            border: 1px solid var(--border-color);
+            font-size: var(--font-size-small);
+            line-height: 1;
+            height: 16px;
+        }
+
+        tr {
+            height: 16px;
+        }
+
+        #productsTable tr td {
+            padding: 1px 4px;
+            height: 16px;
+        }
+
+        #productsTable tr:nth-child(even) {
+            background-color: rgba(255, 235, 238, 0.3);
+        }
+
+        #total {
+            font-weight: bold;
+            font-size: 11px;
+            color: var(--text-accent); /* Darker red for totals */
+        }
+
+        .footer {
+            margin-top: 0.8rem;
+            font-size: 0.75em;
+            padding: 8px;
+            border-radius: 6px;
+            position: static;
+        }
+
+        .footer p {
+            margin: 3px 0;
+            line-height: 1.3;
+        }
+
+        .footer-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .bank-box {
+            background: #fffafa; /* Snow white background */
+            padding: 8px;
+            border-radius: 5px;
+            margin: 5px 0;
+            border: 1px solid #FFCDD2; /* Light red border */
+            box-shadow: 0 1px 3px rgba(155, 28, 31, 0.1); /* Subtle red shadow */
+        }
+
+        .bank-box h4 {
+            color: var(--text-accent);
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 4px;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .bank-box p {
+            margin: 3px 0;
+            font-size: var(--font-size-small);
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .watermark img {
+            width: 350px;
+            height: auto;
+            opacity: 0.04;
+            transform: rotate(-5deg);
+            filter: grayscale(100%) contrast(80%);
+        }
+
+        .amount-in-words {
+            margin: 5px 0;
+            font-style: italic;
+            font-size: var(--font-size-base);
+            background-color: rgba(255, 235, 238, 0.7); /* Stronger red tint */
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px dashed var(--accent-color); /* Use accent for border */
+        }
+
+        .logo {
+            width: 75px;
+            height: auto;
+        }
+
+        .logo-left {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            z-index: 5;
+        }
+
+        .logo-right {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            z-index: 5;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 85%;
+        }
+
+        .product-table-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        table.product-table {
+            flex-grow: 1;
+        }
+
+        @media print {
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .invoice {
+                height: 297mm;
+                width: 210mm;
+                page-break-after: always;
+                page-break-inside: avoid;
+                padding: 1.2cm 1cm;
+                max-height: 297mm;
+                margin: 0;
+            }
+
+            .page-container {
+                page-break-inside: avoid;
+                page-break-after: always;
+                height: 297mm;
+                width: 210mm;
+                overflow: hidden;
+                margin: 0;
+                padding: 0;
+            }
+
+            table, tr, th, td, .footer {
+                page-break-inside: avoid;
+            }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // Add image preloading function
+        function preloadImages() {
+            const logoImage = new Image();
+            logoImage.src = 'zaky-logo.png';
+            // Try alternative paths if needed
+            logoImage.onerror = function() {
+                console.warn('Failed to load zaky-logo.png, trying alternative...');
+                this.src = 'zaki-logo.png';
+            };
+        }
+    </script>
 </head>
-<body class="bg-white text-gray-800 min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="header-gradient shadow-lg fixed w-full top-0 z-50 text-white">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img src="zaki-logo.png" alt="Zaki Gas Logo" class="h-10 w-10 rounded-lg shadow-md">
-                <div>
-                    <h1 class="text-white text-xl font-bold">ZAKI GAS</h1>
-                    <p class="text-green-100 text-sm">LPG & Gas Solutions</p>
-                </div>
+<body>
+    <div class="page-container">
+        <div class="invoice">
+            <div class="watermark">
+                <img src="zaky-logo.png" alt="Watermark" crossorigin="anonymous" onerror="this.src='zaki-logo.png'; this.onerror=null;">
             </div>
-            <nav class="flex items-center gap-4">
-                <a href="index.html" class="text-white hover:text-green-100 transition-colors">
-                    <i class="fas fa-home mr-2"></i>Home
-                </a>
-            </nav>
-        </div>
-    </header>
+            <img src="zaky-logo.png" alt="Left Logo" class="logo logo-left" crossorigin="anonymous" onerror="this.src='zaki-logo.png'; this.onerror=null;">
+            <img src="zaky-logo.png" alt="Right Logo" class="logo logo-right" crossorigin="anonymous" onerror="this.src='zaki-logo.png'; this.onerror=null;">
 
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-8 relative z-10 pt-20">
-        <div class="max-w-5xl mx-auto">
-            <h2 class="text-3xl font-bold text-center text-green-900 mb-8">Create Zaki Gas Proforma Invoice</h2>
-            <div class="glass-effect rounded-lg p-6">
-                <form id="zakiPfiForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium" for="billTo">Bill To:</label>
-                            <textarea id="billTo" name="billTo" rows="3" class="form-input mt-1 block w-full"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium" for="shipTo">Ship To:</label>
-                            <textarea id="shipTo" name="shipTo" rows="3" class="form-input mt-1 block w-full"></textarea>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium" for="pfiNumber">PFI Number:</label>
-                            <input type="text" id="pfiNumber" name="pfiNumber" value="ZAKI-PFI-001" class="form-input mt-1 block w-full">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium" for="date">Date:</label>
-                            <input type="date" id="date" name="date" class="form-input mt-1 block w-full">
-                        </div>
+            <div class="header">
+                <h1>PRO FORMA INVOICE</h1>
+                <p class="company-name">ZAKY GAS TRADING COMPANY LIMITED</p>
+                <p>P.O. BOX 16859-00100, NAIROBI KENYA</p>
+                <p>TEL: +254 722 809 882</p>
+                <p>Email: Zakigaztrading@gmail.com</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="info">
+                    <div>
+                        <p>PFI NO: <span id="pfiNo"></span></p>
+                        <p>DATE: <span id="date"></span></p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium" for="customerId">Customer ID:</label>
-                        <input type="text" id="customerId" name="customerId" class="form-input mt-1 block w-full">
+                        <p>CUSTOMER: <span id="customer"></span></p>
+                        <p>BILL TO: <span id="transport"></span></p>
                     </div>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-lg font-semibold">Products</h3>
-                            <button type="button" id="addProduct" class="btn btn-accent">
-                                Add Product
-                            </button>
+                </div>
+
+                <div class="product-table-container">
+                    <table class="product-table">
+                        <tr>
+                            <th>NO:</th>
+                            <th>DESCRIPTION</th>
+                            <th>HS CODE</th>
+                            <th>QUANTITY</th>
+                            <th>UNIT PRICE</th>
+                            <th>AMOUNT</th>
+                        </tr>
+                        <tbody id="productsTable"></tbody>
+                        <tr>
+                            <td colspan="5" style="text-align: right;"><strong>TOTAL</strong></td>
+                            <td id="total"></td>
+                        </tr>
+                    </table>
+                    <div class="amount-in-words">
+                        Amount in words: <span id="amountInWords">Zero USD only</span>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p>COUNTRY OF ORIGIN: NAIROBI KENYA</p>
+                    <p>TERM OF SALE: EX-WORKS NAIROBI</p>
+                    <p>VALIDITY: THIS OFFER IS VALID FOR ACCEPTANCE BY CLOSE BUSINESS HOURS</p>
+
+                    <div class="footer-details">
+                        <div>
+                            <h3 style="margin: 5px 0; font-size: 12px;">BANK DETAILS</h3>
+                            <div class="bank-box">
+                                <h4>BANK ACCOUNT 1</h4>
+                                <p>BANK NAME: KCB BANK</p>
+                                <p>AC NAME: ZAKYGAZ ENERGY</p>
+                                <p>AC NO: 1337671312</p>
+                                <p>BRANCH: ELDORET WEST</p>
+                                <p>SWIFT CODE: KCBLKENX</p>
+                                <p>BANK CODE: 01</p>
+                                <p>BRANCH CODE: 168</p>
+                            </div>
                         </div>
-                        <div id="productsList" class="space-y-4">
-                            <div class="product-item glass-effect p-4 rounded-lg">
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium">Description:</label>
-                                        <input type="text" name="descriptions[]" class="form-input mt-1 block w-full">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium">HS Code:</label>
-                                        <input type="text" name="hsCodes[]" class="form-input mt-1 block w-full">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium">Quantity:</label>
-                                        <input type="number" name="quantities[]" class="form-input mt-1 block w-full">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium">Unit Price:</label>
-                                        <input type="number" name="unitPrices[]" step="0.01" class="form-input mt-1 block w-full">
-                                    </div>
-                                </div>
+                        <div>
+                            <h3 style="margin: 5px 0; font-size: 12px;">BANK DETAILS</h3>
+                            <div class="bank-box">
+                                <h4>BANK ACCOUNT 2</h4>
+                                <p>BANK NAME: EQUITY BANK</p>
+                                <p>AC NAME: ZAKYGAZ ENERGY</p>
+                                <p>AC NO: 6610005949</p>
+                                <p>BRANCH: ELDORET</p>
+                                <p>SWIFT CODE: ECOCKENA</p>
+                                <p>BANK CODE: 047</p>
+                                <p>BRANCH CODE: 007</p>
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium" for="currency">Currency:</label>
-                            <select id="currency" name="currency" class="form-input mt-1 block w-full">
-                                <option value="USD" selected>USD</option>
-                                <option value="KES">KES</option>
-                                <option value="EUR">EUR</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium" for="paymentTerms">Payment Terms:</label>
-                            <input type="text" id="paymentTerms" name="paymentTerms" class="form-input mt-1 block w-full">
-                        </div>
-                    </div>
-                    <div class="flex justify-end space-x-4">
-                        <button type="button" id="generatePDF" class="btn">
-                            Generate PDF
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
-    </main>
-    <footer class="bg-gray-100 py-2 mt-auto">
-        <div class="container mx-auto px-4 text-center text-sm text-gray-600">
-            &copy; 2025 Zaki Gas Trading Company Ltd
-        </div>
-    </footer>
+    </div>
+
     <script>
-        // Set default date to today and default currency to USD
-        document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('currency').value = 'USD';
+        function numberToWords(num) {
+            if (!num) return 'Zero';
 
-        // Add product row functionality
-        document.getElementById('addProduct').addEventListener('click', () => {
-            const template = document.querySelector('.product-item').cloneNode(true);
-            template.querySelectorAll('input').forEach(input => input.value = '');
-            document.getElementById('productsList').appendChild(template);
-        });
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const scales = ['', 'Thousand', 'Million', 'Billion'];
 
-        function getFormData() {
-            const form = document.getElementById('zakiPfiForm');
-            const descriptions = [...document.getElementsByName('descriptions[]')].map(el => el.value);
-            const hsCodes = [...document.getElementsByName('hsCodes[]')].map(el => el.value);
-            const quantities = [...document.getElementsByName('quantities[]')].map(el => parseFloat(el.value) || 0);
-            const unitPrices = [...document.getElementsByName('unitPrices[]')].map(el => parseFloat(el.value) || 0);
-
-            const products = descriptions.map((desc, i) => ({
-                description: desc,
-                hsCode: hsCodes[i],
-                quantity: quantities[i],
-                unitPrice: unitPrices[i],
-                total: quantities[i] * unitPrices[i]
-            })).filter(item => item.description && item.quantity > 0);
-
-            return {
-                billTo: form.billTo.value,
-                shipTo: form.shipTo.value,
-                pfiNumber: form.pfiNumber.value,
-                date: form.date.value,
-                customerId: form.customerId.value,
-                currency: form.currency.value || 'KES',
-                paymentTerms: form.paymentTerms.value,
-                products,
-                totalAmount: products.reduce((sum, item) => sum + item.total, 0),
-                createdAt: new Date().toISOString(),
-                stampDate: new Date().toISOString()
-            };
-        }
-
-        document.getElementById('generatePDF').addEventListener('click', () => {
-            const formData = getFormData();
-            if (!formData.billTo || !formData.pfiNumber || !formData.products.length) {
-                alert('Please fill in all required fields and add at least one product.');
-                return;
+            function convertGroup(n) {
+                let result = '';
+                if (n >= 100) {
+                    result += ones[Math.floor(n / 100)] + ' Hundred ';
+                    n %= 100;
+                }
+                if (n >= 10 && n <= 19) {
+                    result += teens[n - 10];
+                } else if (n >= 20) {
+                    result += tens[Math.floor(n / 10)];
+                    if (n % 10 > 0) result += '-' + ones[n % 10];
+                } else if (n > 0) {
+                    result += ones[n];
+                }
+                return result;
             }
-            // Force currency to USD for PDF generation
-            formData.currency = 'USD';
 
-            // Create query parameters
-            const queryParams = new URLSearchParams();
-            if (formData.products && Array.isArray(formData.products)) {
-                const productsStr = JSON.stringify(formData.products);
-                queryParams.append('products', encodeURIComponent(productsStr));
+            const parts = num.toString().split('.');
+            let result = '';
+            let integerPart = parseInt(parts[0]);
+
+            if (integerPart === 0) return 'Zero';
+
+            let scaleIndex = 0;
+            while (integerPart > 0) {
+                if (integerPart % 1000 !== 0) {
+                    result = convertGroup(integerPart % 1000) + ' ' + scales[scaleIndex] + ' ' + result;
+                }
+                integerPart = Math.floor(integerPart / 1000);
+                scaleIndex++;
             }
-            for (const [key, value] of Object.entries(formData)) {
-                if (key !== 'products' && value !== undefined) {
-                    queryParams.append(key, encodeURIComponent(value.toString()));
+
+            if (parts.length > 1) {
+                const cents = parseInt(parts[1].padEnd(2, '0').substring(0, 2));
+                if (cents > 0) {
+                    result += 'and ' + convertGroup(cents) + ' Cents';
                 }
             }
-            // Open template in new window
-            window.open(`zaki-pfi-template.html?${queryParams.toString()}`, '_blank');
+
+            return result.trim();
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function getPFIData() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const data = {};
+                for (const [key, value] of params.entries()) {
+                    try {
+                        if (key === 'products') {
+                            data[key] = JSON.parse(decodeURIComponent(value));
+                            if (!Array.isArray(data[key])) data[key] = [];
+                        } else if (key === 'totalAmount') {
+                            data[key] = parseFloat(decodeURIComponent(value)) || 0;
+                        } else if (key === 'date' || key === 'createdAt' || key === 'stampDate') {
+                            const date = new Date(decodeURIComponent(value));
+                            data[key] = !isNaN(date.getTime()) ? date.toISOString() : new Date().toISOString();
+                        } else {
+                            data[key] = decodeURIComponent(value);
+                        }
+                    } catch (e) {
+                        console.error(`Error parsing ${key}:`, e);
+                        if (key === 'products') data[key] = [];
+                        if (key === 'totalAmount') data[key] = 0;
+                        if (key.includes('date')) data[key] = new Date().toISOString();
+                    }
+                }
+                data.currency = data.currency || 'USD';
+                data.pfiNumber = data.pfiNumber || 'N/A';
+                data.date = data.date || new Date().toISOString();
+                data.billTo = data.billTo || 'N/A';
+                data.shipTo = data.shipTo || 'N/A';
+                data.products = data.products || [];
+                data.totalAmount = data.totalAmount || 0;
+
+                console.log('Final parsed data (Zaki):', data);
+                return data;
+            } catch (error) {
+                console.error('Error parsing PFI data (Zaki):', error);
+                return null;
+            }
+        }
+
+        function populatePFI() {
+            const data = getPFIData();
+            console.log('PopulatePFI received data (Zaki):', data);
+            if (!data) return;
+
+            try {
+                document.getElementById('pfiNo').textContent = data.pfiNumber;
+                document.getElementById('date').textContent = formatDate(data.date);
+                document.getElementById('customer').textContent = data.billTo;
+                document.getElementById('transport').textContent = data.shipTo;
+
+                const productsTable = document.getElementById('productsTable');
+                productsTable.innerHTML = '';
+
+                const minRowsToDisplay = 12;
+                const productsToRender = Math.max(data.products.length, minRowsToDisplay);
+
+                for (let i = 0; i < productsToRender; i++) {
+                    const row = document.createElement('tr');
+                    row.style.height = '16px';
+                    if (i < data.products.length) {
+                        const product = data.products[i];
+                        const quantity = product.quantity || 0;
+                        const unitPrice = product.unitPrice || 0;
+                        const amount = quantity * unitPrice;
+                        row.innerHTML = `
+                            <td style="height:16px;">${i + 1}</td>
+                            <td style="height:16px;">${product.description || 'N/A'}</td>
+                            <td style="height:16px;">${product.hsCode || 'N/A'}</td>
+                            <td style="height:16px;">${formatNumber(quantity)}</td>
+                            <td style="height:16px;">${formatNumber(unitPrice)}</td>
+                            <td style="height:16px;">${formatNumber(amount)}</td>
+                        `;
+                    } else {
+                        row.innerHTML = `
+                            <td style="height:16px;">${i + 1}</td>
+                            <td style="height:16px;">&nbsp;</td>
+                            <td style="height:16px;">&nbsp;</td>
+                            <td style="height:16px;">&nbsp;</td>
+                            <td style="height:16px;">&nbsp;</td>
+                            <td style="height:16px;">&nbsp;</td>
+                        `;
+                        row.style.height = '16px';
+                    }
+                    productsTable.appendChild(row);
+                }
+
+                const totalAmount = data.totalAmount;
+                document.getElementById('total').textContent = `${formatNumber(totalAmount)} ${data.currency}`;
+
+                try {
+                    let amountInWordsText = numberToWords(totalAmount);
+                    if (data.currency !== 'USD') {
+                        amountInWordsText = amountInWordsText.replace('Dollars', data.currency);
+                    } else {
+                        amountInWordsText = amountInWordsText.replace(' Dollars', '');
+                    }
+                    document.getElementById('amountInWords').textContent = `${amountInWordsText} ${data.currency} Only`;
+                } catch (error) {
+                    console.error('Error generating amount in words (Zaki):', error);
+                    document.getElementById('amountInWords').textContent = `Zero ${data.currency} Only`;
+                }
+
+                setTimeout(downloadPDF, 800);
+
+            } catch (error) {
+                console.error('Error in populatePFI (Zaki):', error);
+                alert('An error occurred while generating the Zaki invoice.');
+            }
+        }
+
+        function downloadPDF() {
+            const element = document.querySelector('.invoice');
+            const pfiNo = document.getElementById('pfiNo').textContent;
+
+            document.body.style.width = '210mm';
+            document.body.style.height = '297mm';
+            const wrapper = document.querySelector('.page-container');
+            wrapper.style.width = '210mm';
+            wrapper.style.height = '297mm';
+            wrapper.style.overflow = 'hidden';
+
+            const opt = {
+                margin: 0,
+                filename: `ZAKY_PFI_${pfiNo}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    scrollX: 0,
+                    scrollY: 0,
+                    width: 210 * 3.779527559,
+                    height: 297 * 3.779527559,
+                    logging: false
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait',
+                    compress: true,
+                    hotfixes: ["px_scaling"],
+                    putOnlyUsedFonts: true
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            Promise.all(Array.from(document.images).filter(img => !img.complete)
+                .map(img => new Promise(resolve => { img.onload = resolve; img.onerror = resolve; }))
+            ).then(() => {
+                html2pdf()
+                    .from(element)
+                    .set(opt)
+                    .toPdf()
+                    .get('pdf')
+                    .then((pdf) => {
+                        if (pdf.getNumberOfPages() > 1) {
+                            console.warn('Zaki: More than one page detected, forcing single page');
+                            pdf.deletePage(2);
+                        }
+                        pdf.save(`ZAKY_PFI_${pfiNo}.pdf`);
+                    })
+                    .catch(err => {
+                        console.error('Zaki PDF generation error:', err);
+                        alert('There was an error generating the Zaki PDF.');
+                    });
+            });
+        }
+
+        window.addEventListener('load', function() {
+            preloadImages(); // Preload images
+            setTimeout(populatePFI, 100); // Then populate
         });
     </script>
+    <div style="display: none;">
+        <img src="zaky-logo.png" alt="Logo Preload">
+        <img src="zaki-logo.png" alt="Logo Preload Alternative">
+    </div>
+    <img src="zaky-logo.png" alt="Logo" class="preload-image" crossorigin="anonymous" style="display: none;">
 </body>
 </html>
